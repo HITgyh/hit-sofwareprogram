@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Server
+
+  datasource:
+    url: jdbc:mysql://172.20.97.52:3306/universal
+    username: hit
+    password: hit
+    driver-class-name: com.mysql.cj.jdbc.Driver

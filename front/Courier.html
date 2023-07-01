@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通用批发零售业务系统订单管理页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+        h2 {
+            text-align: center;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        button {
+            padding: 8px 16px;
+            margin-right: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>通用批发零售业务系统订单管理页面</h1>
+    <h2>配送员订单信息</h2>
+    
+    <div>
+        
+    </div>
+    
+    
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>下单时间</th>
+                <th>商品类型</th>
+                <th>商品数量</th>
+                <th>总价</th>
+                <th>所属仓库</th>
+                <th>配送地址</th>
+                <th>客户</th>
+                <th>联系方式</th>
+                <th>配送员</th>
+                <!-- <th>操作</th> -->
+            </tr>
+        </thead>
+        <tbody id="userList">
+            <!-- 用户数据将在此处动态生成 -->
+        </tbody>
+    </table>
+
+    <script>
+        function getUserList(apiUrl) {
+            axios.get('http://localhost:8080/indent/list')
+                .then(function (response) {
+                    // 获取用户列表成功
+                    var userList = response.data.data.records;
+                    var tbody = document.getElementById('userList');
+                    tbody.innerHTML = ''; // 清空表格内容
+
+                    // 动态生成用户列表
+                    userList.forEach(function (user) {
+                        var row = document.createElement('tr');
+
+                        // 创建并填充表格单元格
+                        var indentIdCell = createTableCellWithInput('text', user.indentId);
+                        row.appendChild(indentIdCell);
+
+                        var timeCell = createTableCellWithInput('text', user.time);
+                        row.appendChild(timeCell);
+
+                        var productTypeCell = createTableCellWithInput('text', user.productType);
+                        row.appendChild(productTypeCell);
+
+                        var productQuantityCell = createTableCellWithInput('text', user.productNumber);
+                        row.appendChild(productQuantityCell);
+
+                        var totalPriceCell = createTableCellWithInput('text', user.productRetailUnitPrice
+);
+                        row.appendChild(totalPriceCell);
+
+                        var warehouseCell = createTableCellWithInput('text', user.wareHouseId);
+                        row.appendChild(warehouseCell);
+
+                        var deliveryAddressCell = createTableCellWithInput('text', user.customerAddress
+);
+                        row.appendChild(deliveryAddressCell);
+
+                        var customerCell = createTableCellWithInput('text', user.customerName);
+                        row.appendChild(customerCell);
+
+                        var contactCell = createTableCellWithInput('text', user.customerContact);
+                        row.appendChild(contactCell);
+
+                        var courierCell = createTableCellWithInput('text', user.courierName
+);
+                        row.appendChild(courierCell);
+
+                        // var saveButtonCell = document.createElement('td');
+                        // var saveButton = document.createElement('button');
+                        // saveButton.textContent = '保存';
+                        // saveButton.addEventListener('click', function () {
+                        //     var editedUser = {
+                        //         id: idCell.firstChild.value,
+                        //         orderTime: orderTimeCell.firstChild.value,
+                        //         productType: productTypeCell.firstChild.value,
+                        //         productQuantity: productQuantityCell.firstChild.value,
+                        //         totalPrice: totalPriceCell.firstChild.value,
+                        //         warehouse: warehouseCell.firstChild.value,
+                        //         deliveryAddress: deliveryAddressCell.firstChild.value,
+                        //         customer: customerCell.firstChild.value,
+                        //         contact: contactCell.firstChild.value,
+                        //         courier: courierCell.firstChild.value
+                        //     };
+                        //     editUser(editedUser); 
+                        // });
+                        // saveButtonCell.appendChild(saveButton);
+                        // row.appendChild(saveButtonCell);
+
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    var tbody = document.getElementById('userList');
+                    tbody.innerHTML = '<tr><td colspan="11">获取用户列表失败</td></tr>';
+                });
+        }
+
+        
+        function createTableCellWithInput(type, value) {
+            var cell = document.createElement('td');
+            var input = document.createElement('input');
+            input.type = type;
+            input.value = value;
+            cell.appendChild(input);
+            return cell;
+        }
+
+        function editUser(editedUser) {
+           
+            axios.put('http://localhost:8080/common/edit', editedUser)
+                .then(function (response) {
+                    // 编辑用户成功
+                    if (!response.data.code) {
+                        console.log(response);
+                        getUserList('userList'); // 重新获取用户列表
+                    } else {
+                        console.log(response.data.msg);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        // 页面加载完成时获取全部用户信息列表
+        document.addEventListener('DOMContentLoaded', function () {
+            getUserList('userList');
+        });
+    </script>
+</body>
+</html>

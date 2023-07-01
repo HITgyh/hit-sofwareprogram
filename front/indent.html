@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>通用批发零售业务系统订单管理页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+        h2 {
+            text-align: center;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        button {
+            padding: 8px 16px;
+            margin-right: 10px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>通用批发零售业务系统订单管理页面</h1>
+    <h2>订单信息</h2>
+    
+    <div>
+        
+    </div>
+    
+    
+    <table id="userTable">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>下单时间</th>
+                <th>商品类型</th>
+                <th>商品数量</th>
+                <th>总价</th>
+                <th>所属仓库</th>
+                <th>配送地址</th>
+                <th>客户</th>
+                <th>联系方式</th>
+                <th>配送员</th>
+                <th>保存</th>
+                <th>删除</th>
+            </tr>
+        </thead>
+        <tbody id="userList">
+            <!-- 用户数据将在此处动态生成 -->
+        </tbody>
+    </table>
+
+    <table id="newUserTable">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>下单时间</th>
+                <th>商品类型</th>
+                <th>商品数量</th>
+                <th>总价</th>
+                <th>所属仓库</th>
+                <th>配送地址</th>
+                <th>客户</th>
+                <th>联系方式</th>
+                <th>配送员</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="newUserRow">
+            <td><input type="text" id="newindentId"></td>
+            <td><input type="text" id="newtime"></td>
+            <td><input type="text" id="newproductType"></td>
+            <td><input type="text" id="newproductNumber"></td>
+            <td><input type="text" id="newproductRetailUnitPrice"></td>
+            <td><input type="text" id="newwareHouseId"></td>
+            <td><input type="text" id="newcustomerAddress"></td>
+            <td><input type="text" id="newcustomerName"></td>
+            <td><input type="text" id="newcustomerContact"></td>
+            <td><input type="text" id="newcourierName"></td>
+            
+            <td class="center-align"><button id="newSaveButton">新建</button></td>
+        </tbody>
+    </table>
+
+    <script>
+        function getUserList(apiUrl) {
+            axios.get('http://localhost:8080/indent/list')
+                .then(function (response) {
+                    // 获取用户列表成功
+                    var userList = response.data.data.records;
+                    var tbody = document.getElementById('userList');
+                    tbody.innerHTML = ''; // 清空表格内容
+
+                    // 动态生成用户列表
+                    userList.forEach(function (user) {
+                        var row = document.createElement('tr');
+
+                        // 创建并填充表格单元格
+                        var indentIdCell = createTableCellWithInput('text', user.indentId);
+                        row.appendChild(indentIdCell);
+
+                        var timeCell = createTableCellWithInput('text', user.time);
+                        row.appendChild(timeCell);
+
+                        var productTypeCell = createTableCellWithInput('text', user.productType);
+                        row.appendChild(productTypeCell);
+
+                        var productQuantityCell = createTableCellWithInput('text', user.productNumber);
+                        row.appendChild(productQuantityCell);
+
+                        var totalPriceCell = createTableCellWithInput('text', user.productRetailUnitPrice
+);
+                        row.appendChild(totalPriceCell);
+
+                        var warehouseCell = createTableCellWithInput('text', user.wareHouseId);
+                        row.appendChild(warehouseCell);
+
+                        var deliveryAddressCell = createTableCellWithInput('text', user.customerAddress
+);
+                        row.appendChild(deliveryAddressCell);
+
+                        var customerCell = createTableCellWithInput('text', user.customerName);
+                        row.appendChild(customerCell);
+
+                        var contactCell = createTableCellWithInput('text', user.customerContact);
+                        row.appendChild(contactCell);
+
+                        var courierCell = createTableCellWithInput('text', user.courierName
+);
+                        row.appendChild(courierCell);
+
+                        var saveButtonCell = document.createElement('td');
+                        var saveButton = document.createElement('button');
+                        saveButton.textContent = '保存';
+                        saveButton.addEventListener('click', function () {
+                            var editedUser = {
+                                indentId: indentIdCell.firstChild.value,
+                                time: timeCell.firstChild.value,
+                                productType: productTypeCell.firstChild.value,
+                                productNumber: productQuantityCell.firstChild.value,
+                                productRetailUnitPrice: totalPriceCell.firstChild.value,
+                                wareHouseId: warehouseCell.firstChild.value,
+                                customerAddress: deliveryAddressCell.firstChild.value,
+                                customerName: customerCell.firstChild.value,
+                                customerContact: contactCell.firstChild.value,
+                                courierName: courierCell.firstChild.value
+                            };
+                            editUser(editedUser); 
+                        });
+                        saveButtonCell.appendChild(saveButton);
+
+                        var deleteButtonCell = document.createElement('td');
+                        var deleteButton = document.createElement('button');
+                        deleteButton.textContent = '删除';
+                        deleteButton.addEventListener('click', function () {
+                            deleteUser(user.indentId); 
+                        });
+                        deleteButtonCell.appendChild(deleteButton);
+
+                        row.appendChild(saveButtonCell);
+                        row.appendChild(deleteButtonCell);
+
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                    var tbody = document.getElementById('userList');
+                    tbody.innerHTML = '<tr><td colspan="11">获取用户列表失败</td></tr>';
+                });
+        }
+
+        
+        function createTableCellWithInput(type, value) {
+            var cell = document.createElement('td');
+            var input = document.createElement('input');
+            input.type = type;
+            input.value = value;
+            cell.appendChild(input);
+            return cell;
+        }
+
+        function deleteUser(warehouseId) {
+           axios.delete('http://localhost:8080/indent/delete/' + warehouseId)
+               .then(function (response) {
+                   // 删除用户成功
+                   if (!response.data.code) {
+                       console.log(response);
+                       getUserList('userList'); // 重新获取用户列表
+                   } else {
+                       console.log(response.data.msg);
+                   }
+               })
+               .catch(function (error) {
+                   console.log(error);
+               });
+       }
+
+
+        function addNewUser() {
+           var newindentId = document.getElementById('newindentId').value;
+           var newtime = document.getElementById('newtime').value;
+           var newproductType = document.getElementById('newproductType').value;
+           var newproductNumber = document.getElementById('newproductNumber').value;
+           var newproductRetailUnitPrice = document.getElementById('newproductRetailUnitPrice').value;
+           var newwareHouseId = document.getElementById('newwareHouseId').value;
+           var newcustomerAddress = document.getElementById('newcustomerAddress').value;
+           var newcustomerName = document.getElementById('newcustomerName').value;
+           var newcustomerContact = document.getElementById('newcustomerContact').value;
+           var newcourierName = document.getElementById('newcourierName').value;
+
+           var newUser = {
+            indentId: newindentId,
+            time: newtime,
+            productType: newproductType,
+            productNumber: newproductNumber,
+            productRetailUnitPrice: newproductRetailUnitPrice,
+            wareHouseId: newwareHouseId,
+            customerAddress: newcustomerAddress,
+            customerName: newcustomerName,
+            customerContact: newcustomerContact,
+            courierName: newcourierName
+            };
+
+           axios.post('http://localhost:8080/indent/add', newUser)
+               .then(function (response) {
+                   // 添加用户成功
+                   if (!response.data.code) {
+                       console.log(response);
+                       getUserList('userList'); // 重新获取用户列表
+                   } else {
+                       console.log(response.data.msg);
+                   }
+               })
+               .catch(function (error) {
+                   console.log(error);
+               });
+       }
+
+
+        function editUser(editedUser) {
+           
+            axios.put('http://localhost:8080/indent/edit', editedUser)
+                .then(function (response) {
+                    // 编辑用户成功
+                    if (!response.data.code) {
+                        console.log(response);
+                        getUserList('userList'); // 重新获取用户列表
+                    } else {
+                        console.log(response.data.msg);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        // 页面加载完成时获取全部用户信息列表
+        document.addEventListener('DOMContentLoaded', function () {
+            getUserList('userList');
+            document.getElementById('newSaveButton').addEventListener('click', addNewUser);
+        });
+    </script>
+</body>
+</html>
